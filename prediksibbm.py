@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
 
 # 1. LOAD DATA MENTAH
@@ -41,7 +41,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # 6. TRAIN MODEL
 
-model = LinearRegression()
+model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
 print("Model berhasil dilatih!")
@@ -58,26 +58,25 @@ print(f"Akurasi model (R2 Score): {r2:.4f}")
 # 8. INPUT USER
 jarak = float(input("Masukkan jarak (km): "))
 kecepatan = float(input("Masukkan kecepatan (km/h): "))
-suhu_inside = float(input("Masukan suhu inside : "))
-suhu_outside = float(input("Masukan suhu outside : "))
+suhu_inside_c = float(input("Masukan suhu inside : "))
+suhu_outside_c= float(input("Masukan suhu outside : "))
 
-suhu_inside = (suhu_inside * 9/5) +32
-suhu_outside = (suhu_outside * 9/5) +32
+suhu_inside_f = (suhu_inside_c * 9/5) +32
+suhu_outside_f = (suhu_outside_c * 9/5) +32
 
 # 9. PREDIKSI
 input_data = pd.DataFrame(
-    [[jarak, kecepatan, suhu_inside, suhu_outside]],
-    columns=['distance', 'speed','temp_inside', 'temp_outside']
-)
+    [[jarak, kecepatan, suhu_inside_f, suhu_outside_f]],
+    columns=['distance', 'speed','temp_inside', 'temp_outside'])
 
 prediksi = model.predict(input_data)
-
+hasil = max(0, prediksi[0])
 
 # 10. OUTPUT
 
 print("\n HASIL PREDIKSI ")
 print(f"Jarak       : {jarak} km")
 print(f"Kecepatan   : {kecepatan} km/h")
-print(f"Suhu inside: {suhu_inside} °C")
-print(f"Suhu outside: {suhu_outside} °C")
+print(f"Suhu inside: {suhu_inside_c} °C")
+print(f"Suhu outside: {suhu_outside_c} °C")
 print(f"Konsumsi BBM: {prediksi[0]:.2f} liter")
