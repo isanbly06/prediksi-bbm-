@@ -37,7 +37,7 @@ class Btn(tk.Frame):
 
 # ── FUEL GAUGE (Canvas) ───────────────────────────────────────────────────────
 class FuelGauge(tk.Canvas):
-    MAX = 15.0
+    MAX = 40.0
     def __init__(self, master, **kw):
         super().__init__(master, width=260, height=155,
                          bg=BG_CARD, highlightthickness=0, **kw)
@@ -334,6 +334,7 @@ class App(tk.Tk):
             for c in df.columns:
                 df[c] = pd.to_numeric(df[c], errors='coerce')
             df = df.dropna()
+            df['total_bbm'] = (df['consume'] * df['distance']) / 100
             df.to_csv(os.path.join(base, "data_bersih.csv"), index=False)
             X = df[['distance','speed','temp_inside','temp_outside']]
             y = df['consume']
@@ -373,7 +374,8 @@ class App(tk.Tk):
         so_f = (v['suhu_out'] * 9/5) + 32
         inp  = pd.DataFrame([[v['jarak'], v['kecepatan'], si_f, so_f]],
                             columns=['distance','speed','temp_inside','temp_outside'])
-        p = float(self.model.predict(inp)[0])
+        consume_pred = max(0, float(self.model.predict(inp)[0]))
+        p = (consume_pred * v['jarak']) / 100
         self.gauge.set_value(p)
         self._rvars['bbm'].set(f"{p:.2f} L")
         self._rvars['jarak'].set(f"{v['jarak']:.1f} km")
